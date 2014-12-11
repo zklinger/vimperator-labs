@@ -129,6 +129,10 @@ const Events = Module("events", {
         this.addSessionListener(window, "DOMMenuBarActive", this.closure.onDOMMenuBarActive, true);
         this.addSessionListener(window, "DOMMenuBarInactive", this.closure.onDOMMenuBarInactive, true);
         this.addSessionListener(window, "resize", this.closure.onResize, true);
+        this.addSessionListener(window, "TabOpen", this.closure.onTabEvent, true);
+        this.addSessionListener(window, "TabClose", this.closure.onTabEvent, true);
+        this.addSessionListener(window, "TabMove", this.closure.onTabEvent, true);
+        this.addSessionListener(window, "TabAttrModified", this.closure.onTabEvent, true);
 
     },
 
@@ -1152,6 +1156,10 @@ const Events = Module("events", {
     onDOMMenuBarInactive: function () {
         this._activeMenubar = false;
         modes.isMenuShown = false;
+    },
+
+    onTabEvent: function (event) {
+        tabs.showTabNumbers();
     },
 
     onResize: function (event) {

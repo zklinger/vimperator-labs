@@ -1,4 +1,7 @@
 201x-xx-xx:
+    * Add a new 'tabnumberposition' option to configure where the tab numbers get displayed:
+      'set tabnumberposition=corner' shows them in the top right corner next to the tab.
+      'set tabnumberposition=inside', shows them inside the tab.
     * Keep default Firefox mapping of <PageDown>, <PageUp>, <Left>, <Right>,
       <Up>, <Down>, <Home> and <End>.
       This is done to (a) allow default Firefox smooth scrolling and (b) to

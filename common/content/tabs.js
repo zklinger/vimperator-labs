@@ -554,7 +554,47 @@ const Tabs = Module("tabs", {
             tab2 = this._alternates[0];
         }
         this._alternates = [tab1, tab2];
-    }
+    },
+
+    showTabNumbers: function() {
+        styles.removeSheet(true, "tabnumbers");
+        this.setTabLabels(false)
+
+        if (options.get("tabnumbers").value) {
+            if (options.get("tabnumberposition").value == "corner") {
+                styles.addSheet(true, "tabnumbers", "chrome://*",
+                    "#TabsToolbar { counter-reset:tabnumber; }          " +
+                    "#TabsToolbar tab::after {                          " +
+                    "    counter-increment:tabnumber;                   " +
+                    "    content:counter(tabnumber);                    " +
+                    "    font:bold 0.84em monospace;                    " +
+                    "    cursor: default;                               " +
+                    "}                                                  " +
+                    "#TabsToolbar tab:not([pinned])::after {            " +
+                    "    display:block; padding-bottom:0.4em;           " +
+                    "}                                                  " +
+                    ".tabs-newtab-button { display: none !important; }  " +
+                    // we need to change the visible of the "new tab" buttons
+                    // because the "inline" "new tab" button in the toolbar
+                    // gets moved just after the last app tab with tab numbers on
+                    "#new-tab-button { visibility: visible !important; }"
+                );
+            } else {
+                this.setTabLabels(true)
+            }
+        }
+    },
+
+    setTabLabels: function (add) {
+        let tabs = config.tabbrowser.visibleTabs;
+        for (let [i, tab] in Iterator(tabs)) {
+            if (add)
+                tab.visibleLabel = i + 1 + ": " + tab.label
+            else
+                tab.visibleLabel = tab.label
+        }
+    },
+
 }, {
     copyTab: function (to, from) {
         if (!from)
@@ -1152,20 +1192,26 @@ const Tabs = Module("tabs", {
                     ]
                 });
 
+            options.add(["tabnumberposition", "tnp"],
+                "Where to display the tab numbers",
+                "stringlist", "corner",
+                {
+                    setter: function (value) {
+                        tabs.showTabNumbers();
+                        return value;
+                    },
+                    completer: function (context) [
+                        ["corner", "Show tab number next to the tab in the upper right corner"],
+                        ["inside", "Show tab number inside the tab"]
+                    ]
+                });
+
             options.add(["tabnumbers", "tn"],
                 "Show small numbers at each tab to allow quicker selection",
                 "boolean", false,
                 {
                     setter: function (value) {
-                        // TODO: Change this stuff for muttator
-                        if (value)
-                            styles.addSheet(true, "tabnumbers", "chrome://*",
-                                // we need to change the visible of the "new tab" buttons because the "inline" "new tab" button in the toolbar
-                                // gets moved just after the last app tab with tab numbers on
-                                "#TabsToolbar { counter-reset:tabnumber; } #TabsToolbar tab::after { counter-increment:tabnumber; content:counter(tabnumber); font:bold 0.84em monospace; cursor: default; } #TabsToolbar tab:not([pinned])::after { display:block; padding-bottom:0.4em; } .tabs-newtab-button { display: none !important; } #new-tab-button { visibility: visible !important; }"
-                            );
-                        else
-                            styles.removeSheet(true, "tabnumbers");
+                        tabs.showTabNumbers();
                         return value;
                     }
                 });
